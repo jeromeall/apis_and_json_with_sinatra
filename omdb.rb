@@ -19,15 +19,23 @@ post '/result' do
   search_str = params[:movie]
 
   # Make a request to the omdb api here!
-
-
+  response = Typhoeus.get("www.omdbapi.com", :params => {:s => "#{search_str}"})
+  search_str = response.body
+  result = JSON.parse(search_str)
+  titles = result["Search"].map {|search_hash| "#{search_hash["Title"]} - #{search_hash["Year"]}"}
+  
   # Modify the html output so that a list of movies is provided.
   html_str = "<html><head><title>Movie Search Results</title></head><body><h1>Movie Results</h1>\n<ul>"
-  html_str += "<li>#{search_str}</li></ul></body></html>"
+  titles.map do |title|
+    html_str += "<li><a href = > #{title} </a></li>"
+  end
+    html_str += "</ul></body></html>"
 
+  # html_str += "<li> #{titles[1]}</li></ul></body></html>"
 end
 
 get '/poster/:imdb' do |imdb_id|
+
   # Make another api call here to get the url of the poster.
   html_str = "<html><head><title>Movie Poster</title></head><body><h1>Movie Poster</h1>\n"
   html_str = "<h3>#{imdb_id}</h3>"
